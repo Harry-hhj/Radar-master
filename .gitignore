@@ -20,3 +20,4 @@ pydarknet.html
 *.o
 *.so
 .env
+test_data/*

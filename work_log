@@ -1,0 +1,16 @@
+feature0:
+开发雷达站的最基础的功能
+log:
+cfg中yolov3.cfg确认替换
+data中coco.names确认替换
+requirements.txt确认暂时更新
+tmp.py为临时文件，原型为video_demo.py
+selector.py为功能小文件，需要合并为tool
+test_data用于存放测试用数据，结构如下
+├── 1.avi 为代替相机1测试的视频 比赛视频
+└── 2.MOV 为代替相机2测试的视频 环境C楼
+test_func用于存放测试一些开发能的测试文件
+├── mulprocess.py 用于多线程程序的测试，测试结果为4net，FPS13->16
+└── tmp.py 雷达站先前的实现文件，为main.py的开发原型
+改进想法：track和detect共存，分批，先测试track的FPS率，然后检测完立刻进入track模式，测试最好的帧数
+
