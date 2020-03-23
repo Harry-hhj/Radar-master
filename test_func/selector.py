@@ -1,6 +1,5 @@
 import cv2
 
-data_detected_path = "./data_detected.txt"
 ROI_name = ["偷家", "警戒区域", "能量机关", "我方打福定点", "敌方打福定点", "碉堡", "敌方基地", "敌方哨兵"]
 
 
