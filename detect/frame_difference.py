@@ -11,8 +11,9 @@ from others.math import solve_coincide
 test_state = const.test_state
 ROI_name = const.ROI_name
 ROI_name_trans = const.ROI_name_tans
+COINCIDENCE = const.COINCIDENCE_DIFF
 
-test_state1 = True
+test_state1 = False
 
 
 def absdiff_demo(image_1, image_2, sThre):
@@ -63,19 +64,33 @@ def diffdetect(frame, frame2, arr, detect_color):
 
             if w * h < 400:
                 continue
+            cv2.rectangle(frame_2, (x, y), (x + w, y + h), (255, 0, 0), 2)
             rect.append((x, y, w, h))  # x代表横向
-            for i in range(len(arr)):
-                if solve_coincide((arr[i][0], arr[i][1], arr[i][0] + arr[i][2], arr[i][1] + arr[i][3]),(x,y,x+w,y+h))>0.8:
-                    img = frame_2[y:y + h, x:x + w]
-                    armor = get_color(img)
-                    if detect_color in armor:
-                        cv2.rectangle(frame_2, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                        cv2.putText(frame_2, "%s: detected enermy." % str(ROI_name_trans[arr[i][4]]), (20, text_pos),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
-                        text_pos += 20
+
+    text_pos = 20
+    for i in range(len(arr)):
+        cv2.rectangle(frame_2, (arr[i][0], arr[i][1]), (arr[i][0] + arr[i][2], arr[i][1] + arr[i][3]), (255, 0, 0))
+        det = False
+        flag = False
+        for j in range(len(rect)):
+            x, y, w, h = rect[j]
+            if solve_coincide((arr[i][0], arr[i][1], arr[i][0] + arr[i][2], arr[i][1] + arr[i][3]),
+                              (x, y, x + w, y + h)) > COINCIDENCE:
+                det = True
+                img = frame2[y:y + h, x:x + w]
+                armor = get_color(img)
+                print(armor)
+                if detect_color in armor:
+                    if flag:
+                        cv2.putText(frame_2, text, (20, text_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
                     else:
-                        cv2.putText(frame_2, str(ROI_name_trans[arr[i][4]]) + ": Car not matched with armor.", (20, text_pos),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
+                        flag = True
+                    text = ROI_name_trans[arr[i][4]] + ": detected enermy."
+                    text_pos += 20
+                elif not flag:
+                    text = ROI_name_trans[arr[i][4]] + ": Car not matched with armor."
+        if det:
+            cv2.putText(frame_2, text, (20, text_pos), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
 
     return frame_2
 

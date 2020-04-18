@@ -21,3 +21,8 @@ pydarknet.html
 *.so
 .env
 test_data/*
+results/*
+recording/*
+__pycache__
+*/__pycache__
+*.avi

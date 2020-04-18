@@ -21,13 +21,14 @@ class STATE(enum.Enum):
 ''''''''''''''''''''''''''''''''''''''''
 调参数请前往const包
 '''''''''''''''''''''''''''''''''''''''''
-mode = STATE.DETECT_DIFF  # mode.name  mode.value
+mode = STATE.DETECT  # mode.name  mode.value
 print('\''*50)
 print("Current State is ")
 print('\''*50)
 print(mode.name)
 
 test_state = const.test_state
+record_state = const.record_state
 main_cam_num = const.main_cam_num
 SCORE = const.SCORE
 COINCIDENCE = const.COINCIDENCE
@@ -62,13 +63,14 @@ def init(framedown, frameup=None):
 
 
 if __name__ == "__main__":
+    # writer = cv2.VideoWriter("out2.avi", cv2.VideoWriter_fourcc('I', '4', '2', '0'), 20.0, (1000, 600))
     if mode.name != 'DETECT_DIFF':
         net1 = Detector(bytes("cfg/yolov3.cfg", encoding="utf-8"), bytes("weights/yolov3_130000.weights", encoding="utf-8"), 0, bytes("cfg/coco.data", encoding="utf-8"))
         net2 = Detector(bytes("cfg/yolov3.cfg", encoding="utf-8"), bytes("weights/yolov3_130000.weights", encoding="utf-8"), 0, bytes("cfg/coco.data", encoding="utf-8"))
 
     if main_cam_num == 2:
         # 机机初始化
-        cap1 = cv2.VideoCapture("test_data/11.mp4")
+        cap1 = cv2.VideoCapture("test_data/t1.mov")
         cap2 = cv2.VideoCapture("test_data/2.MOV")
         r1, frame1 = cap1.read()
         r2, frame2 = cap2.read()
@@ -131,11 +133,11 @@ if __name__ == "__main__":
                     show_image = 'up'
                 else:
                     show_image = 'down'
-            cv2.waitKey(100)
+            cv2.waitKey(1)
 
     elif main_cam_num == 1:
         # 机机初始化
-        cap1 = cv2.VideoCapture("test_data/11.mp4")
+        cap1 = cv2.VideoCapture("test_data/t1.mov")
         r1, frame1 = cap1.read()
         if not r1:
             print("Someting go wrong with the camera......")
@@ -157,6 +159,8 @@ if __name__ == "__main__":
             if mode.name == 'DETECT':
                 detect(net1, frame1, alarm_loc, enermy_color)
                 cv2.imshow("Show", frame1)
+                # frame1 = cv2.resize(frame1, (1000,600))
+                # writer.write(frame1)
             else:
                 frame = diffdetect(frame_1, frame1, alarm_loc, enermy_color)
                 frame_1 = frame1

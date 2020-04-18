@@ -61,6 +61,7 @@ def detect(net, frame, arr: list, enermy_color):
 
     text_pos = 20
     for i in range(len(arr)):
+        cv2.rectangle(frame, (arr[i][0], arr[i][1]), (arr[i][0] + arr[i][2], arr[i][1] + arr[i][3]), (255, 0, 0))
         # print((arr[i][0], arr[i][1], arr[i][2], arr[i][3]), (int(x - w / 2), int(y - h / 2), int(x + w / 2), int(y + h / 2)))
         for j in range(len(car)):
             x, y, w, h = car[j][2]
@@ -76,6 +77,11 @@ def detect(net, frame, arr: list, enermy_color):
                             str(ROI_name_trans[arr[i][4]]), str(armor_enermy[k][0].decode("utf-8"))), (100, text_pos),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
                         text_pos = text_pos + 30
+                        flag = False
+                        break
+                for k in range(len(armor_friend)):
+                    x1, y1, w1, h1 = armor_friend[k][2]
+                    if int(x - w / 2) <= int(x1) <= int(x + w / 2) and int(y - h / 2) <= int(y1) <= int(y + h / 2):
                         flag = False
                         break
                 if flag:
