@@ -9,6 +9,8 @@ from others.math import solve_coincide
 from detect.learning import myThread, detect
 from detect.frame_difference import diffdetect
 from const import const
+from detect.message.warning import warningMessage
+from camera.camera import Camera
 
 
 class STATE(enum.Enum):
@@ -26,6 +28,8 @@ print('\''*50)
 print("Current State is ")
 print('\''*50)
 print(mode.name)
+
+source = 0  # 0:Video 1:Camera
 
 test_state = const.test_state
 record_state = const.record_state
@@ -70,8 +74,12 @@ if __name__ == "__main__":
 
     if main_cam_num == 2:
         # 机机初始化
-        cap1 = cv2.VideoCapture("test_data/t1.mov")
-        cap2 = cv2.VideoCapture("test_data/2.MOV")
+        if source == 0:
+            cap1 = cv2.VideoCapture("test_data/t1.mov")
+            cap2 = cv2.VideoCapture("test_data/2.MOV")
+        elif source == 1:
+            cap1 = Camera()
+            cap2 = Camera()
         r1, frame1 = cap1.read()
         r2, frame2 = cap2.read()
         if not r1 or not r2:
@@ -82,6 +90,8 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         cv2.namedWindow("Show", cv2.WINDOW_NORMAL)
         counter = 0
+        a = warningMessage()
+        b = warningMessage()
         while True:
             start_time = time.time()
             # 取图片s
@@ -94,9 +104,10 @@ if __name__ == "__main__":
                 RuntimeError("Someting go wrong with the camera......")
                 continue
             if mode.name == 'DETECT':
-                thread1 = myThread(1, "Thread-1", net1, frame1, alarm_loc_down, enermy_color)
+                thread1 = myThread(1, "Thread-1", net1, frame1, alarm_loc_down, enermy_color, a)
                 thread1.start()
-                thread2 = myThread(2, "Thread-2", net2, frame2, alarm_loc_up, enermy_color)
+                a.show()
+                thread2 = myThread(2, "Thread-2", net2, frame2, alarm_loc_up, enermy_color, b)
                 thread2.start()
                 threads = []
                 for i in range(3):
@@ -137,7 +148,10 @@ if __name__ == "__main__":
 
     elif main_cam_num == 1:
         # 机机初始化
-        cap1 = cv2.VideoCapture("test_data/t1.mov")
+        if source == 0:
+            cap1 = cv2.VideoCapture("test_data/t1.mov")
+        elif source == 1:
+            cap1 = Camera()
         r1, frame1 = cap1.read()
         if not r1:
             print("Someting go wrong with the camera......")

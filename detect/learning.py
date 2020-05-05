@@ -3,6 +3,7 @@ import threading
 from pydarknet import Image
 from const import const
 from others.math import solve_coincide
+from .message.warning import warningMessage
 
 test_state = const.test_state
 SCORE = const.SCORE
@@ -14,7 +15,7 @@ test_state1 = False
 
 
 class myThread(threading.Thread):  # 继承父类threading.Thread
-    def __init__(self, threadID, name, net, frame, alarm_loc, detect_color):
+    def __init__(self, threadID, name, net, frame, alarm_loc, detect_color, warning):
         a: list
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -23,18 +24,22 @@ class myThread(threading.Thread):  # 继承父类threading.Thread
         self.frame = frame
         self.alarm_loc = alarm_loc
         self.detect_color = detect_color
+        self.warningMesage = warning
 
     def run(self):  # 把要执行的代码写到run函数里面 线程在创建后会直接运行run函数
         if test_state and test_state1:
             print("Starting " + self.name)
 
-        detect(self.net, self.frame, self.alarm_loc, self.detect_color)
+        detect(self.net, self.frame, self.alarm_loc, self.detect_color, self.warningMesage)
+        return self.warningMesage
 
 
-def detect(net, frame, arr: list, enermy_color):
+def detect(net, frame, arr: list, enermy_color, warning):
     dark_frame = Image(frame)
     results = net.detect(dark_frame)
     del dark_frame
+
+    warning.refresh()
 
     armor_friend = []
     armor_enermy = []
@@ -74,8 +79,9 @@ def detect(net, frame, arr: list, enermy_color):
                     x1, y1, w1, h1 = armor_enermy[k][2]
                     if int(x - w / 2) <= int(x1) <= int(x + w / 2) and int(y - h / 2) <= int(y1) <= int(y + h / 2):
                         cv2.putText(frame, "%s: detected enermy %s." % (
-                            str(ROI_name_trans[arr[i][4]]), str(armor_enermy[k][0].decode("utf-8"))), (100, text_pos),
+                            str(ROI_name_trans[arr[i][4]])+str(arr[i][5]), str(armor_enermy[k][0].decode("utf-8"))), (100, text_pos),
                                     cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
+                        warning.update(arr[i][4], arr[i][5], "detected enermy %s." % str(armor_enermy[k][0].decode("utf-8")))
                         text_pos = text_pos + 30
                         flag = False
                         break
@@ -85,6 +91,7 @@ def detect(net, frame, arr: list, enermy_color):
                         flag = False
                         break
                 if flag:
-                    cv2.putText(frame, str(ROI_name_trans[arr[i][4]]) + ": Car not matched with armor.", (100, text_pos),
+                    cv2.putText(frame, str(ROI_name_trans[arr[i][4]]) + str(arr[i][5]) + ": Car not matched with armor.", (100, text_pos),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
+                    warning.update(arr[i][4], arr[i][5], "Car not matched with armor.")
                     text_pos = text_pos + 30

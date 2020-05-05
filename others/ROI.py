@@ -10,6 +10,7 @@ def ROI_init(frame):
 
     print('ROI initializing.....')
     print('='*50)
+    array = [0]*len(ROI_name)
 
     frame_copy = frame.copy()
     loc = []
@@ -25,17 +26,20 @@ def ROI_init(frame):
         if ROI_type == 'c' or ROI_type == 'C':
             break
         if re.search(type_regex, ROI_type):
+            array[int(ROI_type)] += 1
+            index = array[int(ROI_type)]
             bbox = []
             for i in range(4):
                 bbox.append(tmp[i])
             bbox.append(int(ROI_type))
+            bbox.append(index)
             loc.append(bbox)
 
             cv2.rectangle(frame_copy, (bbox[0], bbox[1]), (bbox[0]+bbox[2], bbox[1]+bbox[3]), (0, 255, 0), 2)
             cv2.putText(frame_copy, ROI_type, (bbox[0], bbox[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (50, 170, 50), 2)
             cv2.imshow('ROI_init', frame_copy)
         else:
-            print('Invalid input. Please try again. Notice this will not be add to list.')
+            RuntimeError('Invalid input. Please try again. Notice this will not be add to list.')
 
     print('ROI finished.....')
     print('='*50)
